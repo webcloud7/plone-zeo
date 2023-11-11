@@ -29,6 +29,10 @@ EOT
 
 FROM base
 
+
+RUN apt-get update \
+    && apt-get install -y rsync
+
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \
       org.label-schema.description="ZEO (ZODB) Server." \
