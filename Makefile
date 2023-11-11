@@ -8,7 +8,7 @@ SHELL:=bash
 MAKEFLAGS+=--warn-undefined-variables
 MAKEFLAGS+=--no-builtin-rules
 
-IMAGE_NAME=plone/plone-zeo
+IMAGE_NAME=webcloud7/plone-zeo
 # Current version
 IMAGE_TAG=`python helpers/version.py`
 NIGHTLY_IMAGE_TAG=nightly
@@ -59,3 +59,10 @@ release: build-image push-image ## Build and push the image to docker hub
 build-image-nightly:  ## Build Docker Image Nightly
 	@echo "Building $(IMAGE_NAME):$(NIGHTLY_IMAGE_TAG)"
 	@docker build . -t $(IMAGE_NAME):$(NIGHTLY_IMAGE_TAG) -f Dockerfile.nightly --no-cache
+
+.PHONY: buildx
+buildx:  ## Build Docker Image
+	@echo "Building $(IMAGE_NAME):$(IMAGE_TAG)"
+	@docker build . -t $(IMAGE_NAME):$(IMAGE_TAG) -f Dockerfile
+	@docker buildx build --platform linux/amd64,linux/arm64 --no-cache -t $(IMAGE_NAME):$(IMAGE_TAG) -f ./Dockerfile --push .
+
