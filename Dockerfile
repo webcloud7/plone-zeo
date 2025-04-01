@@ -1,7 +1,7 @@
 FROM python:3.11-slim-buster as base
 FROM base as builder
 
-ENV ZEO_VERSION=5.4.0
+ENV ZEO_VERSION=5.4.0.1
 
 RUN mkdir /wheelhouse
 
@@ -17,7 +17,7 @@ FROM base
 
 
 RUN apt-get update \
-    && apt-get install -y rsync
+    && apt-get install -y rsync build-essential
 
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \
@@ -32,6 +32,8 @@ RUN useradd --system -m -d /app -U -u 500 plone \
     && find . \( -type f -a -name '*.pyc' -o -name '*.pyo' \) -exec rm -rf '{}' + \
     && mkdir -p /data /app/var \
     && chown -R plone:plone /app /data
+
+RUN sed -i '957s/.*./    link_or_copy = shutil.copy/' /app/lib/python3.11/site-packages/ZODB/blob.py
 
 WORKDIR /app
 USER plone
