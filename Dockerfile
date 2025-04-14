@@ -1,7 +1,7 @@
 FROM python:3.11-slim-buster as base
 FROM base as builder
 
-ENV ZEO_VERSION=5.4.0
+ENV ZEO_VERSION=5.4.1
 
 RUN mkdir /wheelhouse
 
@@ -11,13 +11,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /usr/share/doc\
     && pip install -U "pip"
 
-RUN pip wheel "zeo==${ZEO_VERSION}" --wheel-dir=/wheelhouse
+RUN pip wheel "zeo==${ZEO_VERSION}" --wheel-dir=/wheelhouse -c https://dist.plone.org/release/6.0.9/constraints.txt
 
 FROM base
 
 
 RUN apt-get update \
-    && apt-get install -y rsync build-essential
+    && apt-get install -y rsync build-essential vim
 
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \

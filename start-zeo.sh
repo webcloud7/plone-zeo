@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DIRS=("/data/filestorage" "/data/blobstorage" "/data/cache" "/data/log" "/app/var")
+DIRS=("/data/filestorage" "/data/blobvolume/blobstorage" "/data/cache" "/data/log" "/app/var")
 
 # Create directories to be used by zeo
 for DIR in "${DIRS[@]}"; do
