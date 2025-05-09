@@ -13,4 +13,4 @@ def extract_version(path: Path) -> str:
     match = re.search(PATTERN, data)
     return match.groups()[0]
 
-print(extract_version(DOCKERFILE) + '.1-blobvol')
+print(extract_version(DOCKERFILE) + '.4-blobvol')

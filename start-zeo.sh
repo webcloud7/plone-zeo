@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-service cron start
+sudo service cron start
 
 DIRS=("/data/filestorage" "/data/blobvolume/blobstorage" "/data/cache" "/data/log" "/app/var")
 

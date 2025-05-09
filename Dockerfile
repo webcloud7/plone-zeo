@@ -17,7 +17,7 @@ FROM base
 
 
 RUN apt-get update \
-    && apt-get install -y rsync build-essential vim cron
+    && apt-get install -y rsync build-essential cron sudo
 
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \
@@ -25,6 +25,17 @@ LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.vendor="Plone Foundation"
 
 COPY --from=builder /wheelhouse /wheelhouse
+
+
+COPY start-zeo.sh /app/start-zeo.sh
+COPY etc /app/etc
+COPY scripts /app/scripts
+
+RUN echo "plone ALL=(ALL) NOPASSWD: /usr/sbin/service cron start, /usr/sbin/service cron stop, /usr/sbin/service cron restart" >> /etc/sudoers.d/plone
+RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py" > /etc/cron.d/python-cron
+RUN chmod 0644 /etc/cron.d/python-cron
+RUN crontab /etc/cron.d/python-cron
+
 
 RUN useradd --system -m -d /app -U -u 500 plone \
     && python -m venv /app \
@@ -35,14 +46,6 @@ RUN useradd --system -m -d /app -U -u 500 plone \
 
 WORKDIR /app
 USER plone
-
-COPY start-zeo.sh /app/start-zeo.sh
-COPY etc /app/etc
-COPY scripts /app/scripts
-
-RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py" > /etc/cron.d/python-cron
-RUN chmod 0644 /etc/cron.d/python-cron
-RUN crontab /etc/cron.d/python-cron
 
 EXPOSE 8100
 VOLUME /data
