@@ -17,7 +17,7 @@ FROM base
 
 
 RUN apt-get update \
-    && apt-get install -y rsync build-essential vim
+    && apt-get install -y rsync build-essential vim cron
 
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \
@@ -33,13 +33,16 @@ RUN useradd --system -m -d /app -U -u 500 plone \
     && mkdir -p /data /app/var \
     && chown -R plone:plone /app /data
 
-RUN sed -i '957s/.*./    link_or_copy = shutil.copy/' /app/lib/python3.11/site-packages/ZODB/blob.py
-
 WORKDIR /app
 USER plone
 
 COPY start-zeo.sh /app/start-zeo.sh
 COPY etc /app/etc
+COPY scripts /app/scripts
+
+RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py" > /etc/cron.d/python-cron
+RUN chmod 0644 /etc/cron.d/python-cron
+RUN crontab /etc/cron.d/python-cron
 
 EXPOSE 8100
 VOLUME /data

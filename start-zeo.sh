@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+service cron start
+
 DIRS=("/data/filestorage" "/data/blobvolume/blobstorage" "/data/cache" "/data/log" "/app/var")
 
 # Create directories to be used by zeo
