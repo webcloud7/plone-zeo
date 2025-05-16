@@ -31,11 +31,11 @@ COPY start-zeo.sh /app/start-zeo.sh
 COPY etc /app/etc
 COPY scripts /app/scripts
 
-RUN echo "plone ALL=(ALL) NOPASSWD: /usr/sbin/service cron start, /usr/sbin/service cron stop, /usr/sbin/service cron restart" >> /etc/sudoers.d/plone
-RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py" > /etc/cron.d/python-cron
+RUN echo "plone ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/plone
+RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py >> /var/log/cron.log 2>&1\n" > /etc/cron.d/python-cron
 RUN chmod 0644 /etc/cron.d/python-cron
 RUN crontab /etc/cron.d/python-cron
-
+RUN touch /var/log/cron.log
 
 RUN useradd --system -m -d /app -U -u 500 plone \
     && python -m venv /app \
