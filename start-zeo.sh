@@ -2,7 +2,6 @@
 set -e
 
 sudo service cron start
-tail -f /var/log/cron.log &
 
 DIRS=("/data/filestorage" "/data/blobvolume/blobstorage" "/data/cache" "/data/log" "/app/var")
 
