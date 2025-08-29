@@ -17,7 +17,7 @@ FROM base
 
 
 RUN apt-get update \
-    && apt-get install -y rsync build-essential vim
+    && apt-get install -y rsync build-essential cron sudo
 
 LABEL maintainer="Plone Community <dev@plone.org>" \
       org.label-schema.name="plone-zeo" \
@@ -26,6 +26,17 @@ LABEL maintainer="Plone Community <dev@plone.org>" \
 
 COPY --from=builder /wheelhouse /wheelhouse
 
+
+COPY start-zeo.sh /app/start-zeo.sh
+COPY etc /app/etc
+COPY scripts /app/scripts
+
+RUN echo "plone ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/plone
+RUN echo "0 0 * * * /app/bin/python /app/scripts/pack.py >> /var/log/cron.log 2>&1\n" > /etc/cron.d/python-cron
+RUN chmod 0644 /etc/cron.d/python-cron
+RUN crontab /etc/cron.d/python-cron
+RUN touch /var/log/cron.log
+
 RUN useradd --system -m -d /app -U -u 500 plone \
     && python -m venv /app \
     && /app/bin/pip install --force-reinstall --no-index --no-deps /wheelhouse/* \
@@ -33,13 +44,8 @@ RUN useradd --system -m -d /app -U -u 500 plone \
     && mkdir -p /data /app/var \
     && chown -R plone:plone /app /data
 
-RUN sed -i '957s/.*./    link_or_copy = shutil.copy/' /app/lib/python3.11/site-packages/ZODB/blob.py
-
 WORKDIR /app
 USER plone
-
-COPY start-zeo.sh /app/start-zeo.sh
-COPY etc /app/etc
 
 EXPOSE 8100
 VOLUME /data
